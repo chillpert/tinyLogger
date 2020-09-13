@@ -8,11 +8,34 @@
 #include <sstream>
 
 #define LOGGER_NAMESPACE log
-
+#define LOGGER_DLL_EXPORT
+#define LOGGER_DLL_BUILD
 #define LOGGER_MESSAGE_TYPE_CAPS_LOCK false
 #define LOGGER_ALIGN_MESSAGES true
 #define LOGGER_INSERT_SPACE_AFTER_MESSAGE_TYPE true
 #define LOGGER_THROW_RUNTIME_ERROR_FOR_FATAL_ERROR false
+
+#ifdef LOGGER_DLL_EXPORT
+  #if defined( _WIN32 ) || defined( _WIN64 )
+    #ifdef LOGGER_DLL_BUILD
+      #define DLL_EXPORT __declspec(dllexport)
+    #else
+      #define RX_API __declspec(dllimport)
+    #endif
+  #elif defined( unix ) || defined( __unix ) || defined( __unix__ )
+    #define DLL_EXPORT __attribute__((visibility("default")))
+  #else
+    #error "Operating system not supported by logger."
+  #endif
+#else
+  #if defined( _WIN32 ) || defined( _WIN64 )
+    #define DLL_EXPORT
+  #elif defined( unix ) || defined( __unix ) || defined( __unix__ )
+    #define DLL_EXPORT
+  #else
+    #error "Operating system not supported by logger."
+  #endif
+#endif
 
 namespace LOGGER_NAMESPACE
 {
@@ -22,7 +45,9 @@ namespace LOGGER_NAMESPACE
     eWhite,
     eGreen,
     eYellow,
-    eRed
+    eRed,
+    eEmphasizedRed,
+    eDefault
   };
 
   enum class MessageType
@@ -88,7 +113,7 @@ namespace LOGGER_NAMESPACE
     std::stringstream temp;
     ( temp << ... << args );
 
-    print( Color::eRed, MessageType::eFatal, temp.str( ) );
+    print( Color::eEmphasizedRed, MessageType::eFatal, temp.str( ) );
   }
 }
 

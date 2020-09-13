@@ -5,9 +5,6 @@
 
 #if defined( _WIN32 ) || defined( _WIN64 )
   #include <window.h>
-#elif defined( unix ) || defined( __unix ) || defined( __unix__ )
-#else
-  #error "Operating system not supported by logger."
 #endif
 
 namespace LOGGER_NAMESPACE
@@ -19,28 +16,40 @@ namespace LOGGER_NAMESPACE
 
   std::string applyColor( Color color )
   {
-    std::string colorMessage;
+    std::string colorCode;
 
     switch ( color )
     {
+      case Color::eGray:
+        colorCode = "\033[0;37m";
+        break;
+
       case Color::eWhite:
-        colorMessage = "\033[37m";
-      break;
+        colorCode = "\033[1;37m";
+        break;
 
       case Color::eGreen:
-        colorMessage = "\033[32m";
-      break;
+        colorCode = "\033[0;32m";
+        break;
 
       case Color::eYellow:
-        colorMessage = "\033[33m";
-      break;
+        colorCode = "\033[0;33m";
+        break;
 
       case Color::eRed:
-        colorMessage = "\033[31m";
-      break;
+        colorCode = "\033[0;31m";
+        break;
+
+      case Color::eEmphasizedRed:
+        colorCode = "\033[1;4;31m";
+        break;
+
+      case Color::eDefault:
+        colorCode = "\033[0;37m";
+        break;
     }
 
-    return colorMessage;
+    return colorCode;
   }
 
   std::string getTime( )
