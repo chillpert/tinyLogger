@@ -7,13 +7,13 @@
 
 #include <sstream>
 
-#define LOGGER_NAMESPACE log
+#define LOGGER_NAMESPACE lg
 #define LOGGER_DLL_EXPORT
 #define LOGGER_DLL_BUILD
 #define LOGGER_MESSAGE_TYPE_CAPS_LOCK false
 #define LOGGER_ALIGN_MESSAGES true
 #define LOGGER_INSERT_SPACE_AFTER_MESSAGE_TYPE true
-#define LOGGER_THROW_RUNTIME_ERROR_FOR_FATAL_ERROR false
+#define LOGGER_THROW_RUNTIME_ERROR_FOR_FATAL_ERROR true
 
 #ifdef LOGGER_DLL_EXPORT
   #if defined( _WIN32 ) || defined( _WIN64 )
@@ -63,7 +63,7 @@ namespace LOGGER_NAMESPACE
   void print( Color color, MessageType messageType, const std::string& message );
 
   template <typename ...Args>
-  void verbose( Args&& ...args )
+  DLL_EXPORT void verbose( Args&& ...args )
   {
     std::stringstream temp;
     ( temp << ... << args );
@@ -72,7 +72,7 @@ namespace LOGGER_NAMESPACE
   }
 
   template <typename ...Args>
-  void info( Args&& ...args )
+  DLL_EXPORT void info( Args&& ...args )
   {
     std::stringstream temp;
     ( temp << ... << args );
@@ -81,7 +81,7 @@ namespace LOGGER_NAMESPACE
   }
 
   template <typename ...Args>
-  void success( Args&& ...args )
+  DLL_EXPORT void success( Args&& ...args )
   {
     std::stringstream temp;
     ( temp << ... << args );
@@ -90,7 +90,7 @@ namespace LOGGER_NAMESPACE
   }
 
   template <typename ...Args>
-  void warning( Args&& ...args )
+  DLL_EXPORT void warning( Args&& ...args )
   {
     std::stringstream temp;
     ( temp << ... << args );
@@ -99,7 +99,7 @@ namespace LOGGER_NAMESPACE
   }
 
   template <typename ...Args>
-  void error( Args&& ...args )
+  DLL_EXPORT void error( Args&& ...args )
   {
     std::stringstream temp;
     ( temp << ... << args );
@@ -108,12 +108,15 @@ namespace LOGGER_NAMESPACE
   }
 
   template <typename ...Args>
-  void fatal( Args&& ...args )
+  DLL_EXPORT void fatal( Args&& ...args )
   {
     std::stringstream temp;
     ( temp << ... << args );
 
     print( Color::eEmphasizedRed, MessageType::eFatal, temp.str( ) );
+
+    if ( LOGGER_THROW_RUNTIME_ERROR_FOR_FATAL_ERROR )
+      throw std::runtime_error( temp.str( ) );
   }
 }
 

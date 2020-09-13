@@ -4,17 +4,16 @@
 #include <chrono>
 
 #if defined( _WIN32 ) || defined( _WIN64 )
-  #include <window.h>
+  #include <Windows.h>
+  HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 #endif
 
 namespace LOGGER_NAMESPACE
 {
   const bool capsLock = LOGGER_MESSAGE_TYPE_CAPS_LOCK;
   const bool align = LOGGER_ALIGN_MESSAGES;
-  const bool insertSpace = LOGGER_INSERT_SPACE_AFTER_MESSAGE_TYPE;
-  const bool throwError = LOGGER_THROW_RUNTIME_ERROR_FOR_FATAL_ERROR;
 
-  std::string applyColor( Color color )
+  std::string applyColorLinux( Color color )
   {
     std::string colorCode;
 
@@ -52,12 +51,46 @@ namespace LOGGER_NAMESPACE
     return colorCode;
   }
 
+  void applyColorWindows( Color color )
+  {
+    switch ( color )
+    {
+      case Color::eGray:
+        SetConsoleTextAttribute(hConsole, 8);
+        break;
+
+      case Color::eWhite:
+        SetConsoleTextAttribute(hConsole, 15);
+        break;
+
+      case Color::eGreen:
+        SetConsoleTextAttribute(hConsole, 10);
+        break;
+
+      case Color::eYellow:
+        SetConsoleTextAttribute(hConsole, 14);
+        break;
+
+      case Color::eRed:
+        SetConsoleTextAttribute(hConsole, 4);
+        break;
+
+      case Color::eEmphasizedRed:
+        SetConsoleTextAttribute(hConsole, 12);
+        break;
+
+      case Color::eDefault:
+        SetConsoleTextAttribute(hConsole, 15);
+        break;
+    }
+  }
+
   std::string getTime( )
   {
     auto date = std::chrono::system_clock::now( );
     
-    std::time_t tt = std::chrono::system_clock::to_time_t ( date );
-    std::string time = std::ctime( &tt );
+    time_t tt = std::chrono::system_clock::to_time_t ( date );
+    std::string time = ctime( &tt );
     // Remove the line break inserted by ctime.
     time = time.substr( 0, time.size( ) - 1 );
 
@@ -100,7 +133,7 @@ namespace LOGGER_NAMESPACE
         break;
     }
 
-    if ( insertSpace )
+    if ( LOGGER_INSERT_SPACE_AFTER_MESSAGE_TYPE )
       result += " ";
 
     return result;
@@ -108,72 +141,43 @@ namespace LOGGER_NAMESPACE
 
   void print( Color color, MessageType messageType, const std::string& message )
   {
+#if defined( _WIN32 ) || defined( _WIN64 )
     std::stringstream res;
-    res << applyColor( color ) 
-        << formatMessageType( messageType ) 
+    res << formatMessageType( messageType ) 
         << getTime( ) 
-        << message 
-        << applyColor( Color::eWhite );
+        << message;
+
+    // Apply color.
+    applyColorWindows( color );
 
     if ( messageType == MessageType::eFatal)
       std::cerr << res.str( ) << std::endl;
-
     else if ( messageType == MessageType::eVerbose )
       std::clog << res.str( ) << std::endl;
-
     else
-      std::cout << res.str( ) << std::endl;       
-  }
+      std::cout << res.str( ) << std::endl;  
 
-  void info( const char* message )
-  {
-    info( std::string( message ) );
-  }
+    // Reset color.
+    applyColorWindows( Color::eDefault );
 
-  void info( const std::string& message )
-  {
-    print( Color::eWhite, MessageType::eInfo, message );
-  }
+#elif defined( unix ) || defined( __unix ) || defined( __unix__ )
 
-  void success( const char* message )
-  {
-    success( std::string( message ) );
-  }
+    std::stringstream res;
+    res << applyColorLinux( color ) 
+        << formatMessageType( messageType ) 
+        << getTime( ) 
+        << message 
+        << applyColorLinux( Color::eDefault );
 
-  void success( const std::string& message )
-  {
-    print( Color::eGreen, MessageType::eSuccess, message );
-  }
+    if ( messageType == MessageType::eFatal)
+      std::cerr << res.str( ) << std::endl;
+    else if ( messageType == MessageType::eVerbose )
+      std::clog << res.str( ) << std::endl;
+    else
+      std::cout << res.str( ) << std::endl;  
 
-  void warning( const char* message )
-  {
-    warning( std::string( message ) );
-  }
-
-  void warning( const std::string& message )
-  {
-    print( Color::eYellow, MessageType::eWarn, message );
-  }
-
-  void error( const char* message )
-  {
-    error( std::string( message ) );
-  }
-
-  void error( const std::string& message )
-  {
-    print( Color::eRed, MessageType::eError, message );
-  }
-
-  void fatal( const char* message )
-  {
-    fatal( std::string( message ) );
-  }
-
-  void fatal( const std::string& message )
-  {
-    print( Color::eRed, MessageType::eFatal, message );
-    
-    if ( throwError ) throw std::runtime_error( message );
+#else
+  #error "Operating system not supported by logger."
+#endif    
   }
 }
