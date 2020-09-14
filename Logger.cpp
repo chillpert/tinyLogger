@@ -24,7 +24,7 @@ namespace LOGGER_NAMESPACE
         break;
 
       case Color::eWhite:
-        colorCode = "\033[1;37m";
+        colorCode = "\033[0;37m";
         break;
 
       case Color::eGreen:
@@ -51,6 +51,7 @@ namespace LOGGER_NAMESPACE
     return colorCode;
   }
 
+#if defined( _WIN32 ) || defined( _WIN64 )
   void applyColorWindows( Color color )
   {
     switch ( color )
@@ -84,6 +85,7 @@ namespace LOGGER_NAMESPACE
         break;
     }
   }
+#endif
 
   std::string getTime( )
   {

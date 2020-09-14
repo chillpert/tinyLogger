@@ -11,26 +11,26 @@
 
 int main( )
 {
-  lg::verbose( "Apparently, ", 1, " + ", 2, " = ", 1 + 2 );
-  lg::info( "Ah, okay. Thank you for telling me!" );
-  lg::success( "Are you really telling me it worked?" );
-  lg::warning( "I guess I need to be careful now." );
-  lg::error( "A wild error appeared! Luckily, it's not fatal." );
+  logger::verbose( "Apparently, ", 1, " + ", 2, " = ", 1 + 2 );
+  logger::info( "Ah, okay. Thank you for telling me!" );
+  logger::success( "Are you really telling me it worked?" );
+  logger::warning( "I guess I need to be careful now." );
+  logger::error( "A wild error appeared! Luckily, it's not fatal." );
 
   try
   {
-    lg::fatal( "Oh my god! I am panicking. I am about to throw a runtime error." );  
+    logger::fatal( "Oh my god! I am panicking. I am about to throw a runtime error." );  
   }
   catch( ... )
   {
-    lg::success( "Haha, caught ya!" );
+    logger::success( "Haha, caught ya!" );
   }  
 }
 */
 
 #include <sstream>
 
-#define LOGGER_NAMESPACE lg
+#define LOGGER_NAMESPACE logger
 #define LOGGER_DLL_EXPORT
 #define LOGGER_DLL_BUILD
 #define LOGGER_MESSAGE_TYPE_CAPS_LOCK false
