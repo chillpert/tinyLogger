@@ -43,7 +43,7 @@ int main( )
     #ifdef LOGGER_DLL_BUILD
       #define DLL_EXPORT __declspec(dllexport)
     #else
-      #define RX_API __declspec(dllimport)
+      #define DLL_EXPORT __declspec(dllimport)
     #endif
   #elif defined( unix ) || defined( __unix ) || defined( __unix__ )
     #define DLL_EXPORT __attribute__((visibility("default")))
