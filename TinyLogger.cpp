@@ -1,4 +1,4 @@
-#include "Logger.hpp"
+#include "TinyLogger.hpp"
 
 #include <iostream>
 #include <chrono>

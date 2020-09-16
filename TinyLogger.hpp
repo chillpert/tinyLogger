@@ -141,6 +141,19 @@ namespace LOGGER_NAMESPACE
     if ( LOGGER_THROW_RUNTIME_ERROR_FOR_FATAL_ERROR )
       throw std::runtime_error( temp.str( ) );
   }
+
+  template <typename ...Args>
+  DLL_EXPORT void assert( bool statement, Args&& ...args )
+  {
+    std::stringstream temp;
+    ( temp << ... << args );
+
+    if ( !statement )
+    {
+      print( Color::eEmphasizedRed, MessageType::eFatal, temp.str( ) );
+      throw std::runtime_error( temp.str( ) );
+    }      
+  }
 }
 
 #endif // LOGGER_HPP
