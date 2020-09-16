@@ -7,30 +7,30 @@
 
 // EXAMPLE
 /*
-#include "Logger.hpp"
+#include "TinyLogger.hpp"
 
 int main( )
 {
-  logger::verbose( "Apparently, ", 1, " + ", 2, " = ", 1 + 2 );
-  logger::info( "Ah, okay. Thank you for telling me!" );
-  logger::success( "Are you really telling me it worked?" );
-  logger::warning( "I guess I need to be careful now." );
-  logger::error( "A wild error appeared! Luckily, it's not fatal." );
+  tinyLogger::verbose( "Apparently, ", 1, " + ", 2, " = ", 1 + 2 );
+  tinyLogger::info( "Ah, okay. Thank you for telling me!" );
+  tinyLogger::success( "Are you really telling me it worked?" );
+  tinyLogger::warning( "I guess I need to be careful now." );
+  tinyLogger::error( "A wild error appeared! Luckily, it's not fatal." );
 
   try
   {
-    logger::fatal( "Oh my god! I am panicking. I am about to throw a runtime error." );  
+    tinyLogger::fatal( "Oh my god! I am panicking. I am about to throw a runtime error." );  
   }
   catch( ... )
   {
-    logger::success( "Haha, caught ya!" );
+    tinyLogger::success( "Haha, caught ya!" );
   }  
 }
 */
 
 #include <sstream>
 
-#define LOGGER_NAMESPACE logger
+#define LOGGER_NAMESPACE tinyLogger
 #define LOGGER_DLL_EXPORT
 #define LOGGER_DLL_BUILD
 #define LOGGER_MESSAGE_TYPE_CAPS_LOCK false
