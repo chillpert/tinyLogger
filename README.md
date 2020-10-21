@@ -1,3 +1,3 @@
-# Tiny C++ Logger
+# Tiny C++17 Logger
 
-It just works . . .
+It just works . . . 
