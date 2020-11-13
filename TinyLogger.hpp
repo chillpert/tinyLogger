@@ -2,50 +2,48 @@
 #define LOGGER_HPP
 
 // A very simple logger written in C++17.
-// Tested on both Linux and Windows.
+// Tested on both Linux (GCC 9.3.0) and Windows (Visual Studio 2019 MSVC).
+
 // EXAMPLE
-/*
-#include "TinyLogger.hpp"
-
-int main( )
-{
-  TinyLogger::verbose( "Apparently, ", 1, " + ", 2, " = ", 1 + 2 );
-  TinyLogger::info( "Ah, okay. Thank you for telling me!" );
-  TinyLogger::success( "Are you really telling me it worked?" );
-  TinyLogger::warning( "I guess I need to be careful now." );
-  TinyLogger::error( "A wild error appeared! Luckily, it's not fatal." );
-
-  try
-  {
-    TinyLogger::fatal( "Oh my god! I am panicking. I am about to throw a runtime error." );  
-  }
-  catch( ... )
-  {
-    TinyLogger::success( "Haha, caught ya!" );
-  }  
-}
-*/
+//#include "TinyLogger.hpp"
+//
+//int main( )
+//{
+//  TinyLogger::verbose( "Apparently, ", 1, " + ", 2, " = ", 1 + 2 );
+//  TinyLogger::info( "Ah, okay. Thank you for telling me!" );
+//  TinyLogger::success( "Are you really telling me it worked?" );
+//  TinyLogger::warning( "I guess I need to be careful now." );
+//  TinyLogger::error( "A wild error appeared! Luckily, it's not fatal." );
+//
+//  try
+//  {
+//    TinyLogger::fatal( "Oh my god! I am panicking. I am about to throw a runtime error." );
+//  }
+//  catch( ... )
+//  {
+//    TinyLogger::success( "Haha, caught ya!" );
+//  }
+//}
 
 #include <chrono>
 #include <iostream>
 #include <sstream>
 #include <string_view>
 
-#define LOGGER_NAME TinyLogger
+#define TINY_LOGGER_NAME TinyLogger
 
-#define LOGGER_MESSAGE_TYPE_CAPS_LOCK              false
-#define LOGGER_ALIGN_MESSAGES                      true
-#define LOGGER_INSERT_SPACE_AFTER_MESSAGE_TYPE     true
-#define LOGGER_THROW_RUNTIME_ERROR_FOR_FATAL_ERROR true
+#define TINY_LOGGER_MESSAGE_TYPE_CAPS_LOCK              false
+#define TINY_LOGGER_ALIGN_MESSAGES                      true
+#define TINY_LOGGER_INSERT_SPACE_AFTER_MESSAGE_TYPE     true
+#define TINY_LOGGER_THROW_RUNTIME_ERROR_FOR_FATAL_ERROR true
 
-class LOGGER_NAME
+class TINY_LOGGER_NAME
 {
 private:
   enum class Color;
   enum class MessageType;
-  
-public:
 
+public:
   template <typename... Args>
   static void verbose( Args&&... args )
   {
@@ -99,7 +97,7 @@ public:
 
     print( Color::eEmphasizedRed, MessageType::eFatal, temp.str( ) );
 
-    if ( LOGGER_THROW_RUNTIME_ERROR_FOR_FATAL_ERROR )
+    if ( TINY_LOGGER_THROW_RUNTIME_ERROR_FOR_FATAL_ERROR )
       throw std::runtime_error( temp.str( ) );
   }
 
@@ -176,47 +174,48 @@ private:
     switch ( messageType )
     {
       case MessageType::eVerbose:
-        capsLock ? result = "VERBOSE" : result = "Verbose";
+        TINY_LOGGER_MESSAGE_TYPE_CAPS_LOCK ? result = "VERBOSE" : result = "Verbose";
         break;
 
       case MessageType::eInfo:
-        capsLock ? result = "INFO" : result = "Info";
-        if ( align ) result += "   ";
+        TINY_LOGGER_MESSAGE_TYPE_CAPS_LOCK ? result = "INFO" : result = "Info";
+        if ( TINY_LOGGER_ALIGN_MESSAGES )
+          result += "   ";
         break;
 
       case MessageType::eWarn:
-        capsLock ? result = "WARNING" : result = "Warning";
+        TINY_LOGGER_MESSAGE_TYPE_CAPS_LOCK ? result = "WARNING" : result = "Warning";
         break;
 
       case MessageType::eSuccess:
-        capsLock ? result = "SUCCESS" : result = "Success";
+        TINY_LOGGER_MESSAGE_TYPE_CAPS_LOCK ? result = "SUCCESS" : result = "Success";
         break;
 
       case MessageType::eError:
-        capsLock ? result = "ERROR" : result = "Error";
-        if ( align ) result += "  ";
+        TINY_LOGGER_MESSAGE_TYPE_CAPS_LOCK ? result = "ERROR" : result = "Error";
+        if ( TINY_LOGGER_ALIGN_MESSAGES )
+          result += "  ";
         break;
 
       case MessageType::eFatal:
-        capsLock ? result = "FATAL" : result = "Fatal";
-        if ( align ) result += "  ";
+        TINY_LOGGER_MESSAGE_TYPE_CAPS_LOCK ? result = "FATAL" : result = "Fatal";
+        if ( TINY_LOGGER_ALIGN_MESSAGES )
+          result += "  ";
         break;
     }
 
-    if ( LOGGER_INSERT_SPACE_AFTER_MESSAGE_TYPE )
+    if ( TINY_LOGGER_INSERT_SPACE_AFTER_MESSAGE_TYPE )
       result += " ";
 
     return result;
   }
 
-  static void print( Color color, MessageType messageType, std::string_view message )
+  static void print( Color color, MessageType messageType,
+                     std::string_view message )
   {
     std::stringstream res;
-    res << applyColor( color )
-        << formatMessageType( messageType )
-        << getTime( )
-        << message
-        << applyColor( Color::eDefault );
+    res << applyColor( color ) << formatMessageType( messageType ) << getTime( )
+        << message << applyColor( Color::eDefault );
 
     if ( messageType == MessageType::eFatal )
       std::cerr << res.str( ) << std::endl;
@@ -246,9 +245,6 @@ private:
     eError,
     eFatal
   };
-
-  static const bool capsLock = LOGGER_MESSAGE_TYPE_CAPS_LOCK;
-  static const bool align    = LOGGER_ALIGN_MESSAGES;
 };
 
 #endif // LOGGER_HPP
